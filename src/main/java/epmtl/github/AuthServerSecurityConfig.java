@@ -29,6 +29,7 @@ public class AuthServerSecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.csrf().disable();
         http
+                // TODO: Doesn't seem to work well, still get the JSessionID
                 // No session will be created (No JSESSIONID expected)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
