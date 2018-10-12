@@ -133,13 +133,13 @@
 					"type": "basic",
 					"basic": [
 						{
-							"key": "username",
-							"value": "admin_client",
+							"key": "password",
+							"value": "password_client",
 							"type": "string"
 						},
 						{
-							"key": "password",
-							"value": "password_client",
+							"key": "username",
+							"value": "admin_client",
 							"type": "string"
 						},
 						{
@@ -181,6 +181,102 @@
 							"key": "redirect_uri",
 							"value": "http://localhost:8080/auth_code",
 							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/oauth/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"oauth",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "OAuth2_Token admin - Password Grant",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "2a0a8e05-b03c-4660-824d-998074afe0de",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "password_client",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "admin_client",
+							"type": "string"
+						},
+						{
+							"key": "saveHelperData",
+							"type": "any"
+						},
+						{
+							"key": "showPassword",
+							"value": false,
+							"type": "boolean"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded"
+					},
+					{
+						"key": "X-Requested-With",
+						"value": "XMLHttpRequest"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "client_id",
+							"value": "admin_client",
+							"type": "text"
+						},
+						{
+							"key": "client_secret",
+							"value": "password_client",
+							"type": "text",
+							"disabled": true
 						}
 					]
 				},
@@ -407,7 +503,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzkwMTE5NDcsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9BRE1JTiJdLCJqdGkiOiIyZTcwNGE1OC00YzgzLTRlMmUtYTZjMy1lNjkwMjYzYTVmZmUiLCJjbGllbnRfaWQiOiJhZG1pbl9jbGllbnQiLCJzY29wZSI6WyJyZWFkIiwid3JpdGUiLCJ0cnVzdCJdfQ.cH-lggM0TbKkq7XklFYtWkMBTPO19gycwdUj9_2tZK4",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzkwNDgyNzUsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9BRE1JTiJdLCJqdGkiOiIyNWQzNjA0NC03ZTkzLTQ2YTktYmUyOC1lMDFkODIzZGRkM2EiLCJjbGllbnRfaWQiOiJ1c2VyX2NsaWVudCIsInNjb3BlIjpbInJlYWQiXX0.uP06LLjTp3ANrEW1EuYEfRH0-V3lDQzwikPXPI6wEi4",
 							"type": "string"
 						}
 					]
@@ -442,7 +538,7 @@
 					"bearer": [
 						{
 							"key": "token",
-							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzkwMTMzNTQsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9BRE1JTiJdLCJqdGkiOiJkY2QzNjBhYS0zNmJkLTQ4NGUtOGYzNC1iMDk3NmEzYTllMmUiLCJjbGllbnRfaWQiOiJ1c2VyX2NsaWVudCIsInNjb3BlIjpbInJlYWQiXX0.271i5j4T8Nvoucfyt7Qdn6eFzcO0h2AoGpldEfm_nCk",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzkwMTUwODIsInVzZXJfbmFtZSI6ImFkbWluIiwiYXV0aG9yaXRpZXMiOlsiUk9MRV9BRE1JTiJdLCJqdGkiOiI1OTU4YTU1OS0xMzc2LTQ4NjYtYTk1NS0wYmE2MGQxZGI2M2MiLCJjbGllbnRfaWQiOiJ1c2VyX2NsaWVudCIsInNjb3BlIjpbInJlYWQiXX0.cUMS_iq7cQdd3_a0aSWuzS9A2ZmIV-6U7SIPpsvmmBM",
 							"type": "string"
 						}
 					]
@@ -482,14 +578,14 @@
 					"raw": ""
 				},
 				"url": {
-					"raw": "http://localhost:8080/user",
+					"raw": "http://localhost:8080/denied",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
-						"user"
+						"denied"
 					]
 				}
 			},

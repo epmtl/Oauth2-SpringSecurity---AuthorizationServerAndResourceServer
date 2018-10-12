@@ -52,6 +52,10 @@ public class ApplicationTest {
                 .addFilter(springSecurityFilterChain).build();
     }
 
+    private void logStartingTest(String methodName){
+        logger.info("******* TEST " + methodName + " *******");
+    }
+
     @SuppressWarnings("SameParameterValue")
     private String obtainAuthorization(String username,
                                        String password,
@@ -83,10 +87,11 @@ public class ApplicationTest {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private String obtainAccessToken(String username,
-                                     String password,
-                                     String code,
-                                     String redirect_uri) throws Exception {
+    private String obtainAccessTokenAuthCodeGrantType(
+            String username,
+            String password,
+            String code,
+            String redirect_uri) throws Exception {
 
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         params.add("grant_type", "authorization_code");
@@ -96,6 +101,7 @@ public class ApplicationTest {
         ResultActions result
                 = mockMvc.perform(post("/oauth/token")
                 .params(params)
+                        // Should not be these credentials but username and password of the calling entity
                 .header(
                         HttpHeaders.AUTHORIZATION, "Basic " +
                         Base64Utils.encodeToString((username  +  ":" + password).getBytes())
@@ -111,32 +117,68 @@ public class ApplicationTest {
         return jsonParser.parseMap(resultString).get("access_token").toString();
     }
 
+    @SuppressWarnings("SameParameterValue")
+    private String obtainAccessTokenPasswordGrantType(
+            String username,
+            String password,
+            String client_id,
+            String client_secret) throws Exception {
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "password");
+        params.add("username", username);
+        params.add("password", password);
+        params.add("client_id", client_id);
+
+        ResultActions result
+                = mockMvc.perform(post("/oauth/token")
+                .params(params)
+                // Should not be these credentials but username and password of the calling entity
+                .header(
+                        HttpHeaders.AUTHORIZATION, "Basic " +
+                                Base64Utils.encodeToString((client_id  +  ":" + client_secret).getBytes())
+                )
+                .accept("application/json;charset=UTF-8")
+        )
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json;charset=UTF-8"));
+
+        String resultString = result.andReturn().getResponse().getContentAsString();
+
+        JacksonJsonParser jsonParser = new JacksonJsonParser();
+        return jsonParser.parseMap(resultString).get("access_token").toString();
+    }
+
 
     @Test
     public void givenNoToken_whenGetSecureRequest_thenUnauthorized() throws Exception {
-        logger.info("******* TEST1 *******");
+        String method_name = Thread.currentThread().getStackTrace()[1].getMethodName();
+        logStartingTest(method_name);
         mockMvc.perform(get("/api/v1/read_access"))
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     public void givenNoToken_whenGetUnSecureRequest_thenOK() throws Exception {
-        logger.info("******* TEST2 *******");
+        String method_name = Thread.currentThread().getStackTrace()[1].getMethodName();
+        logStartingTest(method_name);
         mockMvc.perform(get("/unsecured"))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void givenNoToken_whenGetDeniedRequest_thenDenied() throws Exception {
-        logger.info("******* TEST3 *******");
+        String method_name = Thread.currentThread().getStackTrace()[1].getMethodName();
+        logStartingTest(method_name);
         mockMvc.perform(get("/denied"))
                 .andExpect(status().isUnauthorized());
     }
 
 
     @Test
-    public void givenToken_whenPostGetSecureRequest_thenOk() throws Exception {
-        logger.info("******* TEST4 *******");
+    public void givenToken_whenPostGetSecureRequestUsingAuthCodeGrant_thenOk() throws Exception {
+        String method_name = Thread.currentThread().getStackTrace()[1].getMethodName();
+        logStartingTest(method_name);
         final String redirect_uri = "http://localhost:8080/auth_code";
         String authorizationCode = obtainAuthorization(
                 "admin",
@@ -147,7 +189,7 @@ public class ApplicationTest {
         );
         logger.info("******* Authorization Code = " + authorizationCode);
 
-        String accessToken = obtainAccessToken(
+        String accessToken = obtainAccessTokenAuthCodeGrantType(
                 "admin_client",
                 "password_client",
                 authorizationCode,
@@ -159,6 +201,25 @@ public class ApplicationTest {
                 .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
         .andExpect(content().string("Secured Read API by Scope"));
+    }
+
+
+    @Test
+    public void givenToken_whenPostGetSecureRequestUsingPasswordGrant_thenOk() throws Exception {
+        String method_name = Thread.currentThread().getStackTrace()[1].getMethodName();
+        logStartingTest(method_name);
+        String accessToken = obtainAccessTokenPasswordGrantType(
+                "admin",
+                "password",
+                "admin_client",
+                "password_client"
+        );
+        logger.info("******* Access Token = " + accessToken);
+
+        mockMvc.perform(get("/api/v1/read_access")
+                .header("Authorization", "Bearer " + accessToken))
+                .andExpect(status().isOk())
+                .andExpect(content().string("Secured Read API by Scope"));
     }
 
 

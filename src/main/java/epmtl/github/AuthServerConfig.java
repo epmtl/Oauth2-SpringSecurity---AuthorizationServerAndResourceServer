@@ -5,11 +5,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
 import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerEndpointsConfigurer;
+import org.springframework.security.oauth2.config.annotation.web.configurers.AuthorizationServerSecurityConfigurer;
 import org.springframework.security.oauth2.provider.token.TokenStore;
 import org.springframework.security.oauth2.provider.token.store.JwtAccessTokenConverter;
 import org.springframework.security.oauth2.provider.token.store.JwtTokenStore;
@@ -32,6 +34,10 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    // Added to support password grant type
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
     @Bean
     @SuppressWarnings("WeakerAccess")
     public JwtAccessTokenConverter accessTokenConverter() {
@@ -46,11 +52,19 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         return new JwtTokenStore(accessTokenConverter());
     }
 
+    /*
+    // TODO: Implement the proper authenticationManager for /oauth/authorize and /oauth/token
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {
+    }
+    */
+
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         endpoints
                 .tokenStore(tokenStore())
+                // Added to support password grant type
+                .authenticationManager(authenticationManager)
                 .accessTokenConverter(accessTokenConverter())
                 // TODO: Doesn't seem to work well, still get the JSessionID
                 // related to :

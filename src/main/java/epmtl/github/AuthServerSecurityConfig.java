@@ -1,14 +1,15 @@
 package epmtl.github;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 @SuppressWarnings("unused")
@@ -18,10 +19,17 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class AuthServerSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private AuthServerBasicAuthProvider authServerBasicAuthProvider;
 
-    @Autowired
-    private UserDetailsService userDetailsService;
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authServerBasicAuthProvider);
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager() throws Exception {
+        return super.authenticationManager();
+    }
 
 
     protected void configure(HttpSecurity http) throws Exception {
@@ -38,10 +46,12 @@ public class AuthServerSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatcher("/oauth/authorize")
                 .authorizeRequests()
                 .anyRequest()
-                .hasRole(ROLE_ADMIN)
+                //.hasRole(ROLE_ADMIN)
+                .authenticated()
                 .and()
                 // required for http Basic Authentication
-                .httpBasic();
+                .httpBasic()
+                ;
 
     }
 
