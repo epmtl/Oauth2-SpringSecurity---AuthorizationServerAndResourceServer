@@ -14,8 +14,8 @@ import javax.servlet.http.HttpSession;
 
 @RestController
 @SuppressWarnings("unused")
-public class WebController {
-    private Logger logger = LoggerFactory.getLogger(WebController.class);
+public class ResourceServerWebController {
+    private Logger logger = LoggerFactory.getLogger(ResourceServerWebController.class);
 
     @RequestMapping("/unsecured")
     public String unsecured(){
