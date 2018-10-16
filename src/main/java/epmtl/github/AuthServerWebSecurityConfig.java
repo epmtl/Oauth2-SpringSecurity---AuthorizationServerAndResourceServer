@@ -5,25 +5,48 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 
 @SuppressWarnings("unused")
 @Configuration
 @EnableWebSecurity
 @Order(-1) // Takes precedence over AuthServer Config and other WebSecurityConfigurer
-public class AuthServerSecurityConfig extends WebSecurityConfigurerAdapter {
+public class AuthServerWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    private AuthServerBasicAuthProvider authServerBasicAuthProvider;
+    private CustomPasswordEncoder passwordEncoder;
 
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(authServerBasicAuthProvider);
+    @Bean
+    @SuppressWarnings("WeakerAccess")
+    public UserDetailsService authServerUserDetailsService() {
+        final String ADMIN_USERNAME = "admin";
+        final String ADMIN_PASSWORD = "password";
+        final String ADMIN_ROLE = "ADMIN";
+        InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+        manager.createUser(User
+                .withUsername(ADMIN_USERNAME)
+                .password(passwordEncoder.encode(ADMIN_PASSWORD))
+                .roles(ADMIN_ROLE).build());
+        return manager;
+    }
+
+    @Bean
+    @SuppressWarnings("WeakerAccess")
+    public DaoAuthenticationProvider authServerAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider
+                = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(authServerUserDetailsService());
+        authProvider.setPasswordEncoder(passwordEncoder);
+        return authProvider;
     }
 
     @Bean
@@ -31,6 +54,10 @@ public class AuthServerSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManager();
     }
 
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(authServerAuthenticationProvider());
+    }
 
     protected void configure(HttpSecurity http) throws Exception {
         String ROLE_ADMIN = "ADMIN";

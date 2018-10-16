@@ -19,8 +19,9 @@ public class ResourceServerWebController {
 
     @RequestMapping("/unsecured")
     public String unsecured(){
-        logger.info("Unsecured uri");
-        return "Unsecured URI";
+        final String text = "This API is unsecured.";
+        logger.info(text);
+        return text;
     }
 
     // APIs Below should be accessed as authenticated
@@ -47,20 +48,23 @@ public class ResourceServerWebController {
     // API below is OAuth Secured
     @RequestMapping("/api/v1/read_access")
     public String oauthReadAccess() {
-        logger.info("Secured Read API by Scope");
-        return "Secured Read API by Scope";
+        final String text = "This API is secure with a Read Scope";
+        logger.info(text);
+        return text;
     }
 
     @RequestMapping("/api/v1/write_access")
     public String oauthWriteAccess() {
-        logger.info("Secured Write API by Scope");
-        return "Secured Write API by Scope";
+        final String text = "This API is secure with a Read Scope";
+        logger.info(text);
+        return text;
     }
 
     @RequestMapping("/denied")
     public String denied() {
-        logger.info("This API Should not be available.");
-        return "This API Should not be available.";
+        final String text = "This API Should not be available.";
+        logger.info(text);
+        return text;
     }
 
 

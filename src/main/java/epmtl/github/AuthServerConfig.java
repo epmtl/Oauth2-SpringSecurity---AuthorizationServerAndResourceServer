@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer;
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer;
@@ -31,7 +30,7 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
     private Logger logger = LoggerFactory.getLogger(AuthServerConfig.class);
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private CustomPasswordEncoder passwordEncoder;
 
     // Added to support password grant type
     @Autowired
@@ -89,11 +88,11 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         // withClient and secret are used as basic Auth.
         clients
                 .inMemory()
-                .withClient("admin_client")
-                .secret(passwordEncoder.encode("password_client"))
+                .withClient("client_admin")
+                .secret(passwordEncoder.encode("password123"))
                 .authorizedGrantTypes(
                         "authorization_code",
-                        "client-credentials",
+                        "client_credentials",
                         "password",
                         "refresh_token")
                 .authorities("ROLE_ADMIN")
@@ -103,11 +102,11 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
                 .accessTokenValiditySeconds(5000)
                 .refreshTokenValiditySeconds(50000)
                 .and()
-                // NOT TESTED YET
-                .withClient("user_client")
-                .secret(passwordEncoder.encode("password_client"))
+                .withClient("client_user")
+                .secret(passwordEncoder.encode("password123"))
                 .authorizedGrantTypes(
                         "authorization_code",
+                        "client_credentials",
                         "refresh_token")
                 .authorities("ROLE_USER")
                 .scopes("read")

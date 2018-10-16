@@ -183,15 +183,15 @@ public class ApplicationTest {
         String authorizationCode = obtainAuthorization(
                 "admin",
                 "password",
-                "admin_client",
+                "client_admin",
                 "code",
                 redirect_uri
         );
         logger.info("******* Authorization Code = " + authorizationCode);
 
         String accessToken = obtainAccessTokenAuthCodeGrantType(
-                "admin_client",
-                "password_client",
+                "client_admin",
+                "password123",
                 authorizationCode,
                 redirect_uri
         );
@@ -200,7 +200,7 @@ public class ApplicationTest {
         mockMvc.perform(get("/api/v1/read_access")
                 .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
-        .andExpect(content().string("Secured Read API by Scope"));
+        .andExpect(content().string("This API is secure with a Read Scope"));
     }
 
 
@@ -211,15 +211,15 @@ public class ApplicationTest {
         String accessToken = obtainAccessTokenPasswordGrantType(
                 "admin",
                 "password",
-                "admin_client",
-                "password_client"
+                "client_admin",
+                "password123"
         );
         logger.info("******* Access Token = " + accessToken);
 
         mockMvc.perform(get("/api/v1/read_access")
                 .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(content().string("Secured Read API by Scope"));
+                .andExpect(content().string("This API is secure with a Read Scope"));
     }
 
 
