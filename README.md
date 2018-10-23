@@ -48,10 +48,11 @@ TBD.
 
 
 ### Security Filters
-HTTP Security is implemented in 3 differents files (2 extending WebSecurityConfigurerAdapter):
+HTTP Security is implemented in 4 files (3 extending WebSecurityConfigurerAdapter):
 - AuthServerSecurityConfig is triggered first and secure the access to `oauth/authorize` api.
 - ResourceServerConfig contains its own HTTP Security filter to restrict access to `api/v1`.
-- WebSecurityConfig is the last one giving access to the remaining apis (`/unsecure`, `/auth_code`, `/denied` and `/user`).
+- RedirectUriWebSecurityConfig for (`/auth_code`).
+- WebSecurityConfig is the last one giving access to the remaining apis (`/unsecure`, `/denied` and `/user`).
 (Note: `/user` requires to be authenticated against the resource server ! - Intended to test various levels of authentication)
 
 ### Limitations
