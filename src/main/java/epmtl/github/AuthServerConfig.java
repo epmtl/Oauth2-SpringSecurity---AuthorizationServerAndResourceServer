@@ -88,27 +88,27 @@ public class AuthServerConfig extends AuthorizationServerConfigurerAdapter {
         // withClient and secret are used as basic Auth.
         clients
                 .inMemory()
-                .withClient("client_admin")
+                .withClient("trusted_backend")
                 .secret(passwordEncoder.encode("password123"))
                 .authorizedGrantTypes(
                         "authorization_code",
                         "client_credentials",
                         "password",
+                        "implicit",
                         "refresh_token")
                 .authorities("ROLE_ADMIN")
-                .scopes("read", "write", "trust")
+                .scopes("read", "write")
                 .redirectUris("http://localhost:8080/auth_code")
                 .autoApprove(true)
                 .accessTokenValiditySeconds(5000)
                 .refreshTokenValiditySeconds(50000)
                 .and()
-                .withClient("client_user")
-                .secret(passwordEncoder.encode("password123"))
+                .withClient("trusted_external_app")
+                .secret(passwordEncoder.encode("password456"))
                 .authorizedGrantTypes(
                         "authorization_code",
-                        "client_credentials",
                         "refresh_token")
-                .authorities("ROLE_USER")
+                .authorities("ROLE_TRUSTED_APP")
                 .scopes("read")
                 .redirectUris("http://localhost:8080/auth_code")
                 // skip the approval page

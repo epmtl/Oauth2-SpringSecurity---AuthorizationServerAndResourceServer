@@ -176,21 +176,21 @@ public class ApplicationTest {
 
 
     @Test
-    public void givenToken_whenPostGetSecureRequestUsingAuthCodeGrant_thenOk() throws Exception {
+    public void givenToken_whenPostGetSecureRequestUsingAuthCodeGrantForUserAdmin_thenOk() throws Exception {
         String method_name = Thread.currentThread().getStackTrace()[1].getMethodName();
         logStartingTest(method_name);
         final String redirect_uri = "http://localhost:8080/auth_code";
         String authorizationCode = obtainAuthorization(
                 "admin",
                 "password",
-                "client_admin",
+                "trusted_backend",
                 "code",
                 redirect_uri
         );
         logger.info("******* Authorization Code = " + authorizationCode);
 
         String accessToken = obtainAccessTokenAuthCodeGrantType(
-                "client_admin",
+                "trusted_backend",
                 "password123",
                 authorizationCode,
                 redirect_uri
@@ -205,13 +205,13 @@ public class ApplicationTest {
 
 
     @Test
-    public void givenToken_whenPostGetSecureRequestUsingPasswordGrant_thenOk() throws Exception {
+    public void givenToken_whenPostGetSecureRequestUsingPasswordGrantForUserAdmin_thenOk() throws Exception {
         String method_name = Thread.currentThread().getStackTrace()[1].getMethodName();
         logStartingTest(method_name);
         String accessToken = obtainAccessTokenPasswordGrantType(
                 "admin",
                 "password",
-                "client_admin",
+                "trusted_backend",
                 "password123"
         );
         logger.info("******* Access Token = " + accessToken);

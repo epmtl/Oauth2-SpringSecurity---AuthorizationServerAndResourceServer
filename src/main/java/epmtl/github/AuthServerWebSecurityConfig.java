@@ -30,20 +30,32 @@ public class AuthServerWebSecurityConfig extends WebSecurityConfigurerAdapter {
     public UserDetailsService authServerUserDetailsService() {
         final String ADMIN_USERNAME = "admin";
         final String ADMIN_PASSWORD = "password";
+        final String USER1_USERNAME = "user1";
+        final String USER1_PASSWORD = "password";
+        final String USER2_USERNAME = "user2";
+        final String USER2_PASSWORD = "password";
         final String ADMIN_ROLE = "ADMIN";
+        final String USER_ROLE = "USER";
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
         manager.createUser(User
                 .withUsername(ADMIN_USERNAME)
                 .password(passwordEncoder.encode(ADMIN_PASSWORD))
                 .roles(ADMIN_ROLE).build());
+        manager.createUser(User
+                .withUsername(USER1_USERNAME)
+                .password(passwordEncoder.encode(USER1_PASSWORD))
+                .roles(USER_ROLE).build());
+        manager.createUser(User
+                .withUsername(USER2_USERNAME)
+                .password(passwordEncoder.encode(USER2_PASSWORD))
+                .roles(USER_ROLE).build());
         return manager;
     }
 
     @Bean
     @SuppressWarnings("WeakerAccess")
     public DaoAuthenticationProvider authServerAuthenticationProvider() {
-        DaoAuthenticationProvider authProvider
-                = new DaoAuthenticationProvider();
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
         authProvider.setUserDetailsService(authServerUserDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder);
         return authProvider;
@@ -60,8 +72,6 @@ public class AuthServerWebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     protected void configure(HttpSecurity http) throws Exception {
-        String ROLE_ADMIN = "ADMIN";
-
         http.csrf().disable();
         http
                 // TODO: Doesn't seem to work well, still get the JSessionID
@@ -73,8 +83,8 @@ public class AuthServerWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatcher("/oauth/authorize")
                 .authorizeRequests()
                 .anyRequest()
-                //.hasRole(ROLE_ADMIN)
                 .authenticated()
+                // redirection URL
                 .and()
                 // required for http Basic Authentication
                 .httpBasic()

@@ -55,7 +55,7 @@ public class ResourceServerWebController {
 
     @RequestMapping("/api/v1/write_access")
     public String oauthWriteAccess() {
-        final String text = "This API is secure with a Read Scope";
+        final String text = "This API is secure with a Write Scope";
         logger.info(text);
         return text;
     }

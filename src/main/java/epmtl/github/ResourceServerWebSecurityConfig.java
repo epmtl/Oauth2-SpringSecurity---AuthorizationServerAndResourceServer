@@ -3,6 +3,7 @@ package epmtl.github;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,10 +19,8 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 @SuppressWarnings("unused")
 // Order = 100 by default
+@Order(101)
 public class ResourceServerWebSecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private final String ROLE_ADMIN = "ADMIN";
-    private final String ROLE_USER = "USER";
 
     @Autowired
     private CustomPasswordEncoder passwordEncoder;
@@ -29,11 +28,14 @@ public class ResourceServerWebSecurityConfig extends WebSecurityConfigurerAdapte
     @Bean
     @SuppressWarnings("WeakerAccess")
     public UserDetailsService resourceServerUserDetailsService() {
-        final String ADMIN_USERNAME = "admin";
-        final String ADMIN_PASSWORD = "password";
-        final String USER_USERNAME = "user";
-        final String USER_PASSWORD = "password";
+        final String ADMIN_USERNAME = "resource_admin";
+        final String ADMIN_PASSWORD = "pass123";
+        final String USER_USERNAME = "resource_user";
+        final String USER_PASSWORD = "pass123";
+        final String ROLE_ADMIN = "ADMIN";
+        final String ROLE_USER = "USER";
         InMemoryUserDetailsManager manager = new InMemoryUserDetailsManager();
+
         manager.createUser(User
                 .withUsername(ADMIN_USERNAME)
                 .password(passwordEncoder.encode(ADMIN_PASSWORD))
@@ -67,20 +69,16 @@ public class ResourceServerWebSecurityConfig extends WebSecurityConfigurerAdapte
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .antMatcher("/**")
-                .authorizeRequests()
-                // unsecured API
-                .antMatchers("/unsecured")
-                .permitAll()
-                // redirection URL
-                .antMatchers("/auth_code")
-                .permitAll()
-                .antMatchers("/denied")
-                .denyAll()
-                .antMatchers("/user")
-                .hasAnyRole(ROLE_ADMIN,ROLE_USER)
+                    .antMatcher("/**")
+                    .authorizeRequests()
+                    .antMatchers("/unsecured")
+                    .permitAll()
+                    .antMatchers("/denied")
+                    .denyAll()
+                    .antMatchers("/user")
+                    .authenticated()
                 .and()
-                .httpBasic()
+                    .httpBasic()
         ;
 
     }
